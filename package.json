@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next",
+    "dev-e": "nodemon server/server.js --watch server",
     "build": "next build",
     "start": "next start",
     "lint": "eslint '**/*.js' '**/*.jsx'"
@@ -15,6 +16,11 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.14",
     "@mui/material": "^5.14.14",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "express-session": "^1.17.1",
+    "mongoose": "^7.6.3",
     "next": "^13.5.6",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -31,6 +37,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "nodemon": "^3.0.1",
     "prettier": "^3.0.3"
   }
 }
