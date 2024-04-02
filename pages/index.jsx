@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import Head from 'next/head';
 
 const Index = () => (
@@ -8,6 +9,8 @@ const Index = () => (
     </Head>
     
     <p>Content on Index page</p>
+
+    <Button varient="contained">MUI button</Button>
   </div>
 );
 
