@@ -1,6 +1,9 @@
 const express = require("express");
 const next = require("next");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const mongoSessionStore = require("connect-mongo");
+
 const User = require("./models/User");
 
 require("dotenv").config();
@@ -18,7 +21,27 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
 
+  const sessionOptions = {
+    name: process.env.SESSION_NAME,
+    secret: process.env.SESSION_SECRET,
+    store: mongoSessionStore.create({
+      mongoUrl: MONGO_URL,
+      ttl: 14 * 24 * 60 * 60,
+    }),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 14 * 24 * 60 * 60 * 1000,
+      domain: "localhost",
+    },
+  };
+
+  const sessionMiddleware = session(sessionOptions);
+  server.use(sessionMiddleware);
+
   server.get("/", async (req, res) => {
+    req.session.foo = "bar";
     const user = JSON.stringify(
       await User.findOne({ slug: "team-builder-book" }).lean()
     );

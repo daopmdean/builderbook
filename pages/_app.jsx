@@ -15,8 +15,6 @@ const propTypes = {
 function MyApp(props)  {
   const { Component, pageProps } = props;
 
-  console.log(pageProps);
-
   return (
     <CacheProvider value={createCache({key: 'css' })}>
       <ThemeProvider theme={theme}>
