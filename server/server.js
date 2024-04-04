@@ -41,11 +41,10 @@ app.prepare().then(() => {
   server.use(sessionMiddleware);
 
   server.get("/", async (req, res) => {
-    req.session.foo = "bar";
-    const user = JSON.stringify(
-      await User.findOne({ slug: "team-builder-book" }).lean()
-    );
-    app.render(req, res, "/", { user });
+    const user = await User.findOne({ slug: "team-builder-book" });
+    req.user = user;
+
+    app.render(req, res, "/");
   });
 
   server.get("*", (req, res) => handle(req, res));

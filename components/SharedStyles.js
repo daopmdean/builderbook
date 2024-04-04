@@ -16,7 +16,7 @@ const styleToolbar = {
 };
 
 const styleLoginButton = {
-  borderRadius: "2px",
+  borderRadius: "8px",
   textTransform: "none",
   font: "16px",
   fontWeight: "400",
