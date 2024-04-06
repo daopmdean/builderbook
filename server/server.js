@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const mongoSessionStore = require("connect-mongo");
 
-const User = require("./models/User");
+const setupGoogle = require("./google");
 
 require("dotenv").config();
 
@@ -40,12 +40,7 @@ app.prepare().then(() => {
   const sessionMiddleware = session(sessionOptions);
   server.use(sessionMiddleware);
 
-  server.get("/", async (req, res) => {
-    const user = await User.findOne({ slug: "team-builder-book" });
-    req.user = user;
-
-    app.render(req, res, "/");
-  });
+  setupGoogle({ ROOT_URL, server });
 
   server.get("*", (req, res) => handle(req, res));
 
