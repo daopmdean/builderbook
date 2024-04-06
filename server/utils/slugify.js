@@ -17,9 +17,9 @@ async function generateSlug(Model, name, filter = {}) {
 }
 
 async function createUniqueSlug(Model, oriSlug, count) {
-  const user = await Model.findOne({ slug: `${slug}-${count}` }, "id");
+  const user = await Model.findOne({ slug: `${oriSlug}-${count}` }, "id");
   if (!user) {
-    return `${slug}-${count}`;
+    return `${oriSlug}-${count}`;
   }
 
   return createUniqueSlug(Model, oriSlug, count + 1);
