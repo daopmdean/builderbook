@@ -5,6 +5,7 @@ const session = require("express-session");
 const mongoSessionStore = require("connect-mongo");
 
 const setupGoogle = require("./google");
+const { insertTemplates } = require("./models/EmailTemplate");
 
 require("dotenv").config();
 
@@ -18,7 +19,7 @@ const dev = process.env.NODE_ENV != "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
   const server = express();
 
   const sessionOptions = {
@@ -39,6 +40,8 @@ app.prepare().then(() => {
 
   const sessionMiddleware = session(sessionOptions);
   server.use(sessionMiddleware);
+
+  await insertTemplates();
 
   setupGoogle({ ROOT_URL, server });
 
