@@ -6,6 +6,7 @@ const mongoSessionStore = require("connect-mongo");
 
 const setupGoogle = require("./google");
 const { insertTemplates } = require("./models/EmailTemplate");
+const Chapter = require("./models/Chapter");
 
 require("dotenv").config();
 
