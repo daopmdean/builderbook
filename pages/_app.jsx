@@ -8,6 +8,7 @@ import createCache from '@emotion/cache';
 
 import Header from '../components/Header';
 import { theme } from '../lib/theme';
+import Notifier from '../components/Notifier';
 
 Router.onRouteChangeStart = () => NProgress.start()
 Router.onRouteChangeComplete = () => NProgress.done()
@@ -31,6 +32,7 @@ function MyApp(props)  {
         <CssBaseline />
         <Header {...pageProps} />
         <Component {...pageProps} />
+        <Notifier />
       </ThemeProvider>
     </CacheProvider>
   );

@@ -1,8 +1,10 @@
 import { Button } from '@mui/material';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
-import withAuth from '../lib/withAuth';
 import { Component } from 'react';
+
+import withAuth from '../lib/withAuth';
+import notify from '../lib/notify';
 
 const propTypes = {
   user: PropTypes.shape({
@@ -30,7 +32,7 @@ class Index extends Component {
 
       <p>Email: {user.email} </p>
 
-      <Button varient="contained">MUI button</Button>
+      <Button varient="contained" onClick={() => notify('well click message')}>MUI button</Button>
     </div>
     );
   };
