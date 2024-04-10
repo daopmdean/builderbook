@@ -1,6 +1,6 @@
 const express = require("express");
-const Chapter = require("../../models/Chapter");
 const router = express.Router();
+const Chapter = require("../../models/Chapter");
 
 router.get("/get-chapter-detail", async (req, res) => {
   try {
