@@ -54,7 +54,7 @@ const Header = ({user}) => (
                 ) : null}
             </div>
           ) : (
-            <Link href="/login" style={{ margin: '0px 20px 0px auto' }}>
+            <Link href="/public/login" as='/login' style={{ margin: '0px 20px 0px auto' }}>
               Log in
             </Link>
           )}

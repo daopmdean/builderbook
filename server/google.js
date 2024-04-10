@@ -70,7 +70,7 @@ function setupGoogle({ ROOT_URL, server }) {
     "/oauth2callback",
     passport.authenticate("google", { failureRedirect: "/login" }),
     (_, res) => {
-      res.redirect("/");
+      res.redirect("/admin");
     }
   );
 

@@ -1,7 +1,7 @@
 import Head from "next/head";
-import withAuth from "../lib/withAuth";
 import { Button } from "@mui/material";
-import { styleLoginButton } from "../components/SharedStyles";
+import { styleLoginButton } from "../../components/SharedStyles";
+import withAuth from "../../lib/withAuth";
 
 
 const Login = () => (

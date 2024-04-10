@@ -34,7 +34,7 @@ class BookClass {
   static async list({ offset = 0, limit = 10 } = {}) {
     const books = await this.find({})
       .sort({ createdAt: -1 })
-      .offset(offset)
+      .skip(offset)
       .limit(limit);
 
     return { books };

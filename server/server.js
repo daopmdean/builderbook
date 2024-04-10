@@ -7,6 +7,7 @@ const mongoSessionStore = require("connect-mongo");
 const setupGoogle = require("./google");
 const { insertTemplates } = require("./models/EmailTemplate");
 const Chapter = require("./models/Chapter");
+const api = require("./api/v1");
 
 require("dotenv").config();
 
@@ -19,6 +20,11 @@ mongoose.connect(MONGO_URL);
 const dev = process.env.NODE_ENV != "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
+const URL_MAP = {
+  "/login": "/public/login",
+  "/my-books": "/customer/my-books",
+};
 
 app.prepare().then(async () => {
   const server = express();
@@ -45,8 +51,16 @@ app.prepare().then(async () => {
   await insertTemplates();
 
   setupGoogle({ ROOT_URL, server });
+  api(server);
 
-  server.get("*", (req, res) => handle(req, res));
+  server.get("*", (req, res) => {
+    const url = URL_MAP[req.path];
+    if (url) {
+      app.render(req, res, url);
+    } else {
+      handle(req, res);
+    }
+  });
 
   server.listen(port, (err) => {
     if (err) throw err;
