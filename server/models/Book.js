@@ -81,7 +81,7 @@ class BookClass {
     return this.UpdateOne({ _id: id }, { $set: modifier });
   }
 
-  static async syncContent({ id }) {
+  static async syncContent({ id, user, request }) {
     const book = await this.findById(id, "githubRepo githubLastCommitSha");
     if (!book) {
       throw new Error("book not found");

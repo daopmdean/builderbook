@@ -1,20 +1,34 @@
 import PropTypes from 'prop-types';
 import Link from 'next/link';
-import { Avatar, Grid, Toolbar } from '@mui/material';
+import { Avatar, Grid, Toolbar, Hidden, Button } from '@mui/material';
 import { styleToolbar } from './SharedStyles';
 import MenuWithAvatar from './MenuWithAvatar';
 
-const optionsMenu = [
+const optionsMenuCustomer = [
   {
-    text: 'Got question?',
-    href: 'https://github.com/async-labs/builderbook/issues',
+    text: 'My books',
+    href: '/customer/my-books',
+    as: '/my-books',
   },
   {
-    text: 'Logout',
+    text: 'Log out',
     href: '/logout',
     anchor: true,
-  }
-]
+  },
+];
+
+ const optionsMenuAdmin = [
+  {
+    text: 'Admin',
+    href: '/admin',
+    as: '/admin',
+  },
+  {
+    text: 'Log out',
+    href: '/logout',
+    anchor: true,
+  },
+];
 
 const propTypes = {
   user: PropTypes.shape({
@@ -31,7 +45,7 @@ const Header = ({user}) => (
   <div>
     <Toolbar style={styleToolbar}>
       <Grid container direction="row" justifyContent="space-around" alignItems="center">
-        <Grid item sm={11} xs={9} style={{ textAlign: 'left' }}>
+        <Grid item sm={9} xs={8} style={{ textAlign: 'left' }}>
           {user ? null : (
             <Link href="/">
               <Avatar 
@@ -42,16 +56,34 @@ const Header = ({user}) => (
             </Link>
           )}
         </Grid>
-        <Grid item sm={1} xs={3} style={{ textAlign: 'right' }}>
+        <Grid item sm={2} xs={2} style={{ textAlign: 'right' }}>
+          {user && user.isAdmin && !user.isGithubConnected ? (
+            <Hidden mdDown>
+              <Link href="/auth/github">
+                <Button variant="contained" color="primary">
+                  Connect Github
+                </Button>
+              </Link>
+            </Hidden>
+          ) : null}
+        </Grid>
+        <Grid item sm={1} xs={2} style={{ textAlign: 'right' }}>
           {user ? (
             <div style={{whiteSpace: 'nowrap' }}>
-              {user.avatarUrl ? (
-                <MenuWithAvatar 
-                  options={optionsMenu}
+              {!user.isAdmin ? (
+                <MenuWithAvatar
+                  options={optionsMenuCustomer}
                   src={user.avatarUrl}
                   alt={user.displayName}
                 />
-                ) : null}
+              ) : null}
+              {user.isAdmin ? (
+                <MenuWithAvatar
+                  options={optionsMenuAdmin}
+                  src={user.avatarUrl}
+                  alt={user.displayName}
+                />
+              ) : null}
             </div>
           ) : (
             <Link href="/public/login" as='/login' style={{ margin: '0px 20px 0px auto' }}>

@@ -81,4 +81,4 @@ IndexWithData.defaultProps = {
   errorMessage: null,
 };
 
-export default withAuth(IndexWithData);
+export default withAuth(IndexWithData, { adminRequired:true });
