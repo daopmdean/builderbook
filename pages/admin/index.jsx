@@ -43,6 +43,11 @@ const Index = ({ books }) => (
 Index.propTypes = propTypes;
 
 class IndexWithData extends React.Component {
+
+  static getInitialProps({ query }) {
+    return { errorMessage: query.error };
+  }
+
   constructor(props) {
     super(props);
 
@@ -52,6 +57,10 @@ class IndexWithData extends React.Component {
   }
 
   async componentDidMount() {
+    if (this.props.errorMessage) {
+      notify(this.props.errorMessage);
+    }
+
     try {
       const { books } = await getBookListApiMethod();
       this.setState({ books }); // eslint-disable-line
@@ -64,5 +73,12 @@ class IndexWithData extends React.Component {
     return <Index {...this.state} />;
   }
 }
+
+IndexWithData.propTypes = {
+  errorMessage: PropTypes.string,
+};
+IndexWithData.defaultProps = {
+  errorMessage: null,
+};
 
 export default withAuth(IndexWithData);

@@ -18,6 +18,21 @@ const mongoSchema = new Schema({
     token_type: String,
     expiry_date: Number,
   },
+  isGithubConnected: {
+    type: Boolean,
+    default: false,
+  },
+  githubAccessToken: {
+    type: String,
+  },
+  githubId: {
+    type: String,
+    unique: true,
+  },
+  githubUsername: {
+    type: String,
+    unique: true,
+  },
   slug: {
     type: String,
     required: true,
@@ -42,7 +57,15 @@ const mongoSchema = new Schema({
 
 class UserClass {
   static publicFields() {
-    return ["id", "displayName", "email", "avatarUrl", "slug", "isAdmin"];
+    return [
+      "id",
+      "displayName",
+      "email",
+      "avatarUrl",
+      "slug",
+      "isAdmin",
+      "isGithubConnected",
+    ];
   }
 
   static async signInOrSignUp({
