@@ -38,6 +38,7 @@ class ReadChapter extends Component {
     }
 
     this.state = {
+      isMobile: false,
       showTOC: false,  
       hideHeader: false,
       chapter,
@@ -47,6 +48,11 @@ class ReadChapter extends Component {
 
   componentDidMount() {
     document.getElementById('main-content').addEventListener('scroll', this.onScroll);
+
+    const isMobile = window.innerWidth < 768
+    if (this.state.isMobile !== isMobile) {
+      this.setState({ isMobile }); // eslint-disable-line
+    }
   }
 
   componentWillUnmount() {
@@ -136,14 +142,24 @@ class ReadChapter extends Component {
   };
 
   renderMainContent() {
-    const { chapter, htmlContent } = this.state;
+    const { 
+      isMobile,
+      showTOC,
+      chapter, 
+      htmlContent,
+    } = this.state;
 
     let padding = '20px 20%';
+    if (!isMobile && showTOC) {
+      padding = '20px 10%';
+    } else if (isMobile) {
+      padding = '0px 10px';
+    }
 
     return (
       <div style={{ padding }} id="chapter-content">
-        <h2>
-          Chapter:
+        <h2 style={{ fontWeight: '400', lineHeight: '1.5em' }}>
+          {chapter.order > 1 ? `Chapter ${chapter.order - 1}: ` : null}
           {chapter.title}
         </h2>
 
@@ -156,8 +172,14 @@ class ReadChapter extends Component {
     );
   }
 
+  closeTocWhenMobile = () => {
+    this.setState((prevState) => ({ showTOC: !prevState.isMobile }))
+  };
+
   renderSidebar() {
-    const { showTOC, hideHeader, chapter } = this.state;
+    const { 
+      isMobile, showTOC, hideHeader, chapter,
+    } = this.state;
     const { book } = chapter;
     const { chapters } = book;
 
@@ -176,7 +198,7 @@ class ReadChapter extends Component {
           transition: 'top 0.5s ease-in',
           overflowY: 'auto',
           overflowX: 'hidden',
-          width: '400px',
+          width: isMobile ? '100%' : '400px',
           padding: '0px 25px',
         }}
       >
@@ -191,6 +213,7 @@ class ReadChapter extends Component {
               <Link
                 as={`/books/${book.slug}/${ch.slug}`}
                 href={`/public/read-chapter?bookSlug=${book.slug}&chapterSlug=${ch.slug}`}
+                onClick={this.closeTocWhenMobile}
               >
                 {ch.title}
               </Link>
@@ -220,6 +243,7 @@ class ReadChapter extends Component {
               style={{
                 color: activeSection && activeSection.hash === s.escapedText ? '#1565C0' : '#222',
               }}
+              onClick={this.closeTocWhenMobile}
             >
               {s.text}
             </a>
@@ -231,10 +255,20 @@ class ReadChapter extends Component {
 
   render() {
     const { user } = this.props;
-    const { chapter, showTOC, hideHeader } = this.state;
+    const {
+      isMobile,
+      chapter, 
+      showTOC,
+      hideHeader,
+    } = this.state;
 
     if (!chapter) {
       return <Error statusCode={404} />;
+    }
+
+    let left = '20px';
+    if (showTOC) {
+      left = isMobile ? '100%' : '400px';
     }
 
     return (
@@ -262,7 +296,7 @@ class ReadChapter extends Component {
             right: 0,
             bottom: 0,
             top: hideHeader ? 0 : '64px',
-            left: '320px',
+            left,
             transition: 'top 0.5s ease-in',
             overflowY: 'auto',
             overflowX: 'hidden',
