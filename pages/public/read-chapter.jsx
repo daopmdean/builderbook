@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import Error from 'next/error';
 import Head from 'next/head';
 import Link from 'next/link';
+import { throttle } from 'lodash';
 
 import withAuth from '../../lib/withAuth';
 import { getChapterDetailApiMethod } from '../../lib/api/public';
+import Header from '../../components/Header';
 
 const styleIcon = {
   opacity: '0.75',
@@ -25,8 +27,8 @@ const defaultProps = {
 };
 
 class ReadChapter extends Component {
-  constructor(props) {
-    super(props);
+  constructor(props, ...args) {
+    super(props, ...args);
 
     const { chapter } = props;
 
@@ -36,9 +38,72 @@ class ReadChapter extends Component {
     }
 
     this.state = {
-     chapter,
-     htmlContent,
-   };
+      showTOC: false,  
+      hideHeader: false,
+      chapter,
+      htmlContent,
+    };
+  }
+
+  componentDidMount() {
+    document.getElementById('main-content').addEventListener('scroll', this.onScroll);
+  }
+
+  componentWillUnmount() {
+    document.getElementById('main-content').removeEventListener('scroll', this.onScroll);
+  }
+
+  onScroll = throttle(() => {
+    this.onScrollActiveSection()
+    this.onScrollHideHeader()
+  }, 500)
+
+  onScrollActiveSection = () => {
+    const sectionElms = document.querySelectorAll('span.section-anchor');
+    let activeSection;
+    let aboveSection;
+
+    for (let i = 0; i < sectionElms.length; i += 1) {
+      const s = sectionElms[i];
+      const b = s.getBoundingClientRect();
+      const anchorBottom = b.bottom;
+
+      if (anchorBottom >= 0 && anchorBottom <= window.innerHeight) {
+        activeSection = {
+          hash: s.attributes.getNamedItem('name').value,
+        };
+
+        break;
+      }
+
+      if (anchorBottom > window.innerHeight && i > 0) {
+        if (aboveSection.bottom <= 0) {
+          activeSection = {
+            hash: sectionElms[i - 1].attributes.getNamedItem('name').value,
+          };
+          break;
+        }
+      } else if (i + 1 === sectionElms.length) {
+        activeSection = {
+          hash: s.attributes.getNamedItem('name').value,
+        };
+      }
+
+      aboveSection = b;
+    }
+
+    if (this.state.activeSection !== activeSection) {
+      this.setState({ activeSection });
+    }
+  };
+
+  onScrollHideHeader = () => {
+    const distanceFromTop = document.getElementById('main-content').scrollTop;
+    const hideHeader = distanceFromTop > 500;
+
+    if (this.state.hideHeader !== hideHeader) {
+      this.setState({ hideHeader });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -66,6 +131,10 @@ class ReadChapter extends Component {
     return { chapter };
   }
 
+  toggleChapterList = () => {
+    this.setState((prevState) => ({ showTOC: !prevState.showTOC }));
+  };
+
   renderMainContent() {
     const { chapter, htmlContent } = this.state;
 
@@ -88,9 +157,13 @@ class ReadChapter extends Component {
   }
 
   renderSidebar() {
-    const { chapter } = this.state;
+    const { showTOC, hideHeader, chapter } = this.state;
     const { book } = chapter;
     const { chapters } = book;
+
+    if (!showTOC) {
+      return null;
+    }
 
     return (
       <div
@@ -98,8 +171,9 @@ class ReadChapter extends Component {
           textAlign: 'left',
           position: 'absolute',
           bottom: 0,
-          top: '64px',
           left: 0,
+          top: hideHeader ? 0 : '64px',
+          transition: 'top 0.5s ease-in',
           overflowY: 'auto',
           overflowX: 'hidden',
           width: '400px',
@@ -130,6 +204,7 @@ class ReadChapter extends Component {
 
   renderSections() {
     const { chapter } = this.state;
+    const { activeSection } = this.state;
     const { sections } = chapter;
 
     if (!sections || !sections.length === 0) {
@@ -140,7 +215,12 @@ class ReadChapter extends Component {
       <ul>
         {sections.map((s) => (
           <li key={s.escapedText} style={{ paddingTop: '10px' }}>
-            <a href={`#${s.escapedText}`}>
+            <a 
+              href={`#${s.escapedText}`} 
+              style={{
+                color: activeSection && activeSection.hash === s.escapedText ? '#1565C0' : '#222',
+              }}
+            >
               {s.text}
             </a>
           </li>
@@ -150,7 +230,8 @@ class ReadChapter extends Component {
   }
 
   render() {
-    const { chapter } = this.state;
+    const { user } = this.props;
+    const { chapter, showTOC, hideHeader } = this.state;
 
     if (!chapter) {
       return <Error statusCode={404} />;
@@ -169,6 +250,8 @@ class ReadChapter extends Component {
           ) : null}
         </Head>
 
+        <Header user={user} hideHeader={hideHeader} />
+
         {this.renderSidebar()}
 
         <div
@@ -178,11 +261,13 @@ class ReadChapter extends Component {
             position: 'fixed',
             right: 0,
             bottom: 0,
-            top: '64px',
+            top: hideHeader ? 0 : '64px',
             left: '320px',
+            transition: 'top 0.5s ease-in',
             overflowY: 'auto',
             overflowX: 'hidden',
           }}
+          id="main-content"
         >
           <div
             style={{
@@ -204,8 +289,8 @@ class ReadChapter extends Component {
           <i //eslint-disable-line
             className="material-icons"
             style={styleIcon}
-            // onClick={this.toggleChapterList}
-            // onKeyPress={this.toggleChapterList}
+            onClick={this.toggleChapterList}
+            onKeyPress={this.toggleChapterList}
             role="button"
           >
             format_list_bulleted

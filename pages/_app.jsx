@@ -30,7 +30,7 @@ function MyApp(props)  {
           <link rel="stylesheet" href="https://storage.googleapis.com/async-await/nprogress-light-spinner.css"/>
         </Head>
         <CssBaseline />
-        <Header {...pageProps} />
+        {pageProps.chapter ? null : <Header {...pageProps} />}
         <Component {...pageProps} />
         <Notifier />
       </ThemeProvider>

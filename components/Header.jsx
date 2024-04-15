@@ -35,14 +35,24 @@ const propTypes = {
     avatarUrl: PropTypes.string,
     displayName: PropTypes.string,
   }),
+  hideHeader: PropTypes.bool,
 };
 
 const defaultProps = {
   user: null,
+  hideHeader: false,
 };
 
-const Header = ({user}) => (
-  <div>
+const Header = ({user, hideHeader}) => (
+  <div
+    style={{
+      overflow: 'hidden',
+      position: 'relative',
+      display: 'block',
+      top: hideHeader ? '-64px' : '0px',
+      transition: 'top 0.5s ease-in',
+    }}
+  >
     <Toolbar style={styleToolbar}>
       <Grid container direction="row" justifyContent="space-around" alignItems="center">
         <Grid item sm={9} xs={8} style={{ textAlign: 'left' }}>
