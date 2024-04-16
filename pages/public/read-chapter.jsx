@@ -8,6 +8,7 @@ import { throttle } from 'lodash';
 import withAuth from '../../lib/withAuth';
 import { getChapterDetailApiMethod } from '../../lib/api/public';
 import Header from '../../components/Header';
+import BuyButton from '../../components/customer/BuyButton';
 
 const styleIcon = {
   opacity: '0.75',
@@ -33,8 +34,10 @@ class ReadChapter extends Component {
     const { chapter } = props;
 
     let htmlContent = '';
-    if (chapter) {
+    if (chapter && (chapter.isFree || chapter.isPurchased)) {
       htmlContent = chapter.htmlContent;
+    } else {      
+      htmlContent = chapter.htmlExcerpt;
     }
 
     this.state = {
@@ -52,6 +55,14 @@ class ReadChapter extends Component {
     const isMobile = window.innerWidth < 768
     if (this.state.isMobile !== isMobile) {
       this.setState({ isMobile }); // eslint-disable-line
+    }
+
+    if (this.props.checkoutCanceled) {
+      notify('Checkout canceled.');
+    }
+
+    if (this.props.error) {
+      notify(this.props.error);
     }
   }
 
@@ -116,7 +127,12 @@ class ReadChapter extends Component {
     if (prevProps.chapter && prevProps.chapter._id !== this.props.chapter._id) {
       document.getElementById('chapter-content').scrollIntoView();
 
-      const { htmlContent } = this.props.chapter;
+      let htmlContent = '';
+      if (prevProps.chapter && (prevProps.chapter.isPurchased || prevProps.chapter.isFree)) {
+        htmlContent = this.props.chapter.htmlContent;
+      } else {
+        htmlContent = this.props.chapter.htmlExcerpt;
+      }
 
       // eslint-disable-next-line
       this.setState({ chapter: this.props.chapter, htmlContent });
@@ -124,7 +140,9 @@ class ReadChapter extends Component {
   }
 
   static async getInitialProps(ctx) {
-    const { bookSlug, chapterSlug } = ctx.query;
+    const { 
+      bookSlug, chapterSlug, buy, checkout_canceled, error,
+    } = ctx.query;
     const { req } = ctx;
 
     const headers = {};
@@ -134,7 +152,14 @@ class ReadChapter extends Component {
 
     const chapter = await getChapterDetailApiMethod({ bookSlug, chapterSlug }, { headers });
 
-    return { chapter };
+    const redirectToCheckout = !!buy;
+
+    return { 
+      chapter, 
+      redirectToCheckout, 
+      checkoutCanceled: !!checkout_canceled, 
+      error,
+    };
   }
 
   toggleChapterList = () => {
@@ -142,12 +167,16 @@ class ReadChapter extends Component {
   };
 
   renderMainContent() {
+    const { user, redirectToCheckout } = this.props;
     const { 
       isMobile,
       showTOC,
       chapter, 
       htmlContent,
     } = this.state;
+    const { book } = chapter;
+
+    user._id = user._id.toString();
 
     let padding = '20px 20%';
     if (!isMobile && showTOC) {
@@ -163,11 +192,15 @@ class ReadChapter extends Component {
           {chapter.title}
         </h2>
 
+        {!chapter.isPurchased && !chapter.isFree ? (
+          <BuyButton user={user} book={book} redirectToCheckout={redirectToCheckout} />
+        ) : null}
         <div
-          className="main-content"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
+        {!chapter.isPurchased && !chapter.isFree ? (
+          <BuyButton user={user} book={book} redirectToCheckout={redirectToCheckout} />
+        ) : null}
       </div>
     );
   }

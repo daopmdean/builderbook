@@ -9,6 +9,7 @@ const { setupGithub } = require("./github");
 const { insertTemplates } = require("./models/EmailTemplate");
 const api = require("./api/v1");
 const routesWithSlug = require("./routesWithSlug");
+const { stripeCheckoutCallback } = require("./stripe");
 
 require("dotenv").config();
 
@@ -54,6 +55,7 @@ app.prepare().then(async () => {
 
   setupGoogle({ ROOT_URL, server });
   setupGithub({ ROOT_URL, server });
+  stripeCheckoutCallback({ server });
   api(server);
   routesWithSlug({ server, app });
 

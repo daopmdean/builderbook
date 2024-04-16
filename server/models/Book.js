@@ -146,6 +146,43 @@ class BookClass {
 
     return book.updateOne({ githubLastCommitSha: lastCommitSha });
   }
+
+  static async buy({ book, user, stripeCharge }) {
+    if (!book) {
+      throw new Error("Book not found");
+    }
+
+    if (!user) {
+      throw new Error("User required");
+    }
+
+    const isPurchased =
+      (await Purchase.find({
+        userId: user._id,
+        bookId: book._id,
+      }).countDocuments()) > 0;
+    if (isPurchased) {
+      throw new Error("You already bought this book.");
+    }
+
+    User.findByIdAndUpdate(user._id, {
+      $addToSet: { purchasedBookIds: book._id },
+    }).exec();
+
+    try {
+      await addToMailchimp({ email: user.email, listName: "purchased" });
+    } catch (error) {
+      console.error("Buy book error:", error);
+    }
+
+    return Purchase.create({
+      userId: user._id,
+      bookId: book._id,
+      amount: book.price * 100,
+      createdAt: new Date(),
+      stripeCharge,
+    });
+  }
 }
 
 mongoSchema.loadClass(BookClass);
@@ -155,3 +192,5 @@ const Book = mongoose.model("Book", mongoSchema);
 module.exports = Book;
 
 const Chapter = require("./Chapter");
+const User = require("./User");
+const Purchase = require("./Purchase");

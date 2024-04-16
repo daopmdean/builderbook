@@ -53,6 +53,7 @@ const mongoSchema = new Schema({
   },
   displayName: String,
   avatarUrl: String,
+  purchasedBookIds: [String],
 });
 
 class UserClass {
