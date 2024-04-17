@@ -183,6 +183,15 @@ class BookClass {
       stripeCharge,
     });
   }
+
+  static async getPurchasedBooks({ purchasedBookIds }) {
+    const purchasedBooks = await this.find({
+      _id: { $in: purchasedBookIds },
+    }).sort({
+      createdAt: -1,
+    });
+    return { purchasedBooks };
+  }
 }
 
 mongoSchema.loadClass(BookClass);

@@ -66,6 +66,7 @@ class UserClass {
       "slug",
       "isAdmin",
       "isGithubConnected",
+      "purchasedBookIds",
     ];
   }
 

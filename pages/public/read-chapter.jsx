@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Error from 'next/error';
 import Head from 'next/head';
 import Link from 'next/link';
+import { withRouter } from 'next/router';
 import { throttle } from 'lodash';
 
 import withAuth from '../../lib/withAuth';
@@ -21,6 +22,9 @@ const propTypes = {
     _id: PropTypes.string.isRequired,
     htmlContent: PropTypes.string,
   }),
+  router: PropTypes.shape({
+    asPath: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 const defaultProps = {
@@ -176,7 +180,9 @@ class ReadChapter extends Component {
     } = this.state;
     const { book } = chapter;
 
-    user._id = user._id.toString();
+    if (user && user._id) {
+      user._id = user._id.toString();
+    }
 
     let padding = '20px 20%';
     if (!isMobile && showTOC) {
@@ -287,7 +293,7 @@ class ReadChapter extends Component {
   }
 
   render() {
-    const { user } = this.props;
+    const { user, router } = this.props;
     const {
       isMobile,
       chapter, 
@@ -317,7 +323,7 @@ class ReadChapter extends Component {
           ) : null}
         </Head>
 
-        <Header user={user} hideHeader={hideHeader} />
+        <Header user={user} hideHeader={hideHeader} redirectUrl={router.asPath}/>
 
         {this.renderSidebar()}
 
@@ -371,4 +377,6 @@ class ReadChapter extends Component {
 ReadChapter.propTypes = propTypes;
 ReadChapter.defaultProps = defaultProps;
 
-export default withAuth(ReadChapter, { loginRequired: false });
+export default withAuth(withRouter(ReadChapter), { 
+  loginRequired: false,
+});
