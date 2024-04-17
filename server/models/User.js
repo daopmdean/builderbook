@@ -3,6 +3,7 @@ const _ = require("lodash");
 const generateSlug = require("../utils/slugify");
 const { getEmailTemplate } = require("./EmailTemplate");
 const sendEmail = require("../aws-ses");
+const { addToMailchimp } = require("../mailchimp");
 
 const { Schema } = mongoose;
 
@@ -130,6 +131,12 @@ class UserClass {
       console.error(
         `Email sending error from ${process.env.EMAIL_ADDRESS_FROM}, to ${email},err: ${err} `
       );
+    }
+
+    try {
+      await addToMailchimp({ email, listName: "signedup" });
+    } catch (error) {
+      console.error("Mailchimp error:", error);
     }
 
     return _.pick(newUser, UserClass.publicFields());

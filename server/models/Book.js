@@ -3,6 +3,7 @@ const frontmatter = require("front-matter");
 
 const generateSlug = require("../utils/slugify");
 const { getCommits, getRepoDetail } = require("../github");
+const { addToMailchimp } = require("../mailchimp");
 
 const { Schema } = mongoose;
 
