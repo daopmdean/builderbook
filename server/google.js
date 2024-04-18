@@ -1,6 +1,8 @@
 const passport = require("passport");
 const { OAuth2Strategy } = require("passport-google-oauth");
+
 const User = require("./models/User");
+const logger = require("./logger");
 
 function setupGoogle({ ROOT_URL, server }) {
   const verify = async (accessToken, refreshToken, profile, verified) => {
@@ -26,7 +28,7 @@ function setupGoogle({ ROOT_URL, server }) {
       verified(null, user);
     } catch (err) {
       verified(err);
-      console.log(err);
+      logger.info(err);
     }
   };
 

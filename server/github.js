@@ -4,6 +4,7 @@ const { oauthAuthorizationUrl } = require("@octokit/oauth-authorization-url");
 const _ = require("lodash");
 
 const User = require("./models/User");
+const logger = require("./logger");
 
 require("dotenv").config();
 
@@ -45,7 +46,7 @@ function setupGithub({ server, ROOT_URL }) {
       clientId: CLIENT_ID,
       redirectUrl: `${ROOT_URL}/auth/github/callback`,
       scopes: ["repo", "user:email"],
-      log: { warn: (message) => console.log(message) },
+      log: { warn: (message) => logger.info(message) },
     });
 
     req.session.githubAuthState = state;
@@ -158,7 +159,7 @@ function getGithubAPI({ user, previews = [], request }) {
     previews,
     log: {
       info(msg, info) {
-        console.log(`Github API log: ${msg}`, {
+        logger.info(`Github API log: ${msg}`, {
           ..._.omit(info, "headers", "request", "body"),
           user: _.pick(user, "_id", "githubUsername", "githubId"),
           ..._.pick(request, "ip", "hostname"),

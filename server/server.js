@@ -10,18 +10,20 @@ const { insertTemplates } = require("./models/EmailTemplate");
 const api = require("./api/v1");
 const routesWithSlug = require("./routesWithSlug");
 const { stripeCheckoutCallback } = require("./stripe");
+const getRootURL = require("../lib/api/getRootUrl");
+const logger = require("./logger");
 
 require("dotenv").config();
-
-const port = parseInt(process.env.PORT, 10) || 8000;
-const ROOT_URL = `http://localhost:${port}`;
-const MONGO_URL = process.env.MONGO_URL_TEST;
-
-mongoose.connect(MONGO_URL);
 
 const dev = process.env.NODE_ENV != "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
+const port = parseInt(process.env.PORT, 10) || 8000;
+const ROOT_URL = getRootURL();
+const MONGO_URL = dev ? process.env.MONGO_URL_TEST : process.env.MONGO_URL;
+
+mongoose.connect(MONGO_URL);
 
 const URL_MAP = {
   "/login": "/public/login",
@@ -70,6 +72,6 @@ app.prepare().then(async () => {
 
   server.listen(port, (err) => {
     if (err) throw err;
-    console.log(`listen on ${ROOT_URL}`);
+    logger.info(`listen on ${ROOT_URL}`);
   });
 });

@@ -3,14 +3,15 @@ const lodash = require("lodash");
 
 const Book = require("./models/Book");
 const User = require("./models/User");
+const getRootURL = require("../lib/api/getRootUrl");
+const logger = require("./logger");
 
 const dev = process.env.NODE_ENV !== "production";
 const API_KEY = dev
   ? process.env.STRIPE_TEST_SECRETKEY
   : process.env.STRIPE_LIVE_SECRETKEY;
 
-const port = process.env.PORT || 8000;
-const ROOT_URL = `http://localhost:${port}`;
+const ROOT_URL = getRootURL;
 
 const stripeInstance = new Stripe(API_KEY, { apiVersion: "2020-03-02" });
 
@@ -73,7 +74,7 @@ function retrieveSession({ sessionId }) {
 }
 
 function createSession({ userId, bookId, bookSlug, userEmail, redirectUrl }) {
-  console.log(
+  logger.debug(
     "stripe createSession",
     userId,
     bookId,

@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const logger = require("./logger");
 
 require("dotenv").config();
 
@@ -30,7 +31,7 @@ async function addToMailchimp({ email, listName }) {
   };
 
   const path = `/lists/${LIST_IDS[listName]}/members/`;
-  console.log("---addToMailchimp---", email);
+  logger.info("---addToMailchimp---", email);
   await callAPI({ path, method: "POST", data });
 }
 
