@@ -21,12 +21,14 @@ const propTypes = {
 
 function MyApp(props)  {
   const { Component, pageProps } = props;
+  const isServer = typeof window === 'undefined';
 
   return (
     <CacheProvider value={createCache({key: 'css' })}>
       <ThemeProvider theme={theme}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <link rel="stylesheet" href={isServer ? '/fonts/server.css' : '/fonts/cdn.css'} />
           <link rel="stylesheet" href="https://storage.googleapis.com/async-await/nprogress-light-spinner.css"/>
         </Head>
         <CssBaseline />

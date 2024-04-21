@@ -5,6 +5,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import { throttle } from 'lodash';
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 
 import withAuth from '../../lib/withAuth';
 import { getChapterDetailApiMethod } from '../../lib/api/public';
@@ -359,15 +360,10 @@ class ReadChapter extends Component {
             left: '15px',
           }}
         >
-          <i //eslint-disable-line
-            className="material-icons"
+          <FormatListBulletedIcon
             style={styleIcon}
             onClick={this.toggleChapterList}
-            onKeyPress={this.toggleChapterList}
-            role="button"
-          >
-            format_list_bulleted
-          </i>
+          />
         </div>
       </div>
     );

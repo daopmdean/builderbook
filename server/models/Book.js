@@ -4,7 +4,7 @@ const frontmatter = require("front-matter");
 const generateSlug = require("../utils/slugify");
 const { getCommits, getRepoDetail } = require("../github");
 const { addToMailchimp } = require("../mailchimp");
-const logger = require("./logger");
+const logger = require("../logger");
 
 const { Schema } = mongoose;
 

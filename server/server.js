@@ -10,8 +10,10 @@ const { insertTemplates } = require("./models/EmailTemplate");
 const api = require("./api/v1");
 const routesWithSlug = require("./routesWithSlug");
 const { stripeCheckoutCallback } = require("./stripe");
+const setupSitemapAndRobots = require("./sitemapAndRobots");
 const getRootURL = require("../lib/api/getRootUrl");
 const logger = require("./logger");
+const helmet = require("helmet");
 
 require("dotenv").config();
 
@@ -32,7 +34,15 @@ const URL_MAP = {
 
 app.prepare().then(async () => {
   const server = express();
+
+  server.use(
+    helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false })
+  );
   server.use(express.json());
+
+  server.get("/_next/*", (req, res) => {
+    handle(req, res);
+  });
 
   const sessionOptions = {
     name: process.env.SESSION_NAME,
@@ -58,6 +68,7 @@ app.prepare().then(async () => {
   setupGoogle({ ROOT_URL, server });
   setupGithub({ ROOT_URL, server });
   stripeCheckoutCallback({ server });
+  setupSitemapAndRobots({ server });
   api(server);
   routesWithSlug({ server, app });
 
