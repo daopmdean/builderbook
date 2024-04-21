@@ -11,6 +11,7 @@ import withAuth from '../../lib/withAuth';
 import { getChapterDetailApiMethod } from '../../lib/api/public';
 import Header from '../../components/Header';
 import BuyButton from '../../components/customer/BuyButton';
+import notify from '../../lib/notify';
 
 const styleIcon = {
   opacity: '0.75',
